@@ -34,14 +34,14 @@ console.log(currentPhoto.value)
 
 const changePhoto = () => {
   let newNumber
+  const baseUrl =
+    'https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/'
+
   do {
     newNumber = Math.floor(Math.random() * 15) + 1
-  } while (
-    `https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/${newNumber}.jpg` ===
-    currentPhoto.value
-  )
+  } while (`${baseUrl}${newNumber}.jpg` === currentPhoto.value)
 
-  currentPhoto.value = `/src/assets/${newNumber}.jpg`
+  currentPhoto.value = `${baseUrl}${newNumber}.jpg`
   console.log(currentPhoto.value)
 }
 </script>
