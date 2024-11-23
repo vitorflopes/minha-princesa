@@ -27,7 +27,9 @@ onUnmounted(() => {
 })
 
 // Array com todas as fotos disponíveis
-const currentPhoto = ref('/src/assets/1.jpg')
+const currentPhoto = ref(
+  'https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/1.jpg'
+)
 console.log(currentPhoto.value)
 
 const changePhoto = () => {
