@@ -30,19 +30,28 @@ onUnmounted(() => {
 const currentPhoto = ref(
   'https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/1.jpg'
 )
-console.log(currentPhoto.value)
+const isLoading = ref(false)
 
-const changePhoto = () => {
+const changePhoto = async () => {
+  isLoading.value = true
   let newNumber
-  const baseUrl =
-    'https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/'
-
   do {
     newNumber = Math.floor(Math.random() * 15) + 1
-  } while (`${baseUrl}${newNumber}.jpg` === currentPhoto.value)
+  } while (
+    `https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/${newNumber}.jpg` ===
+    currentPhoto.value
+  )
 
-  currentPhoto.value = `${baseUrl}${newNumber}.jpg`
-  console.log(currentPhoto.value)
+  // Pré-carrega a imagem antes de mostrar
+  const img = new Image()
+  img.src = `https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/${newNumber}.jpg`
+
+  await new Promise((resolve) => {
+    img.onload = resolve
+  })
+
+  currentPhoto.value = `https://raw.githubusercontent.com/vitorflopes/minha-princesa/b8f3d1f7a41ca35d3dbfd66e025a0d8d5f25719d/src/assets/${newNumber}.jpg`
+  isLoading.value = false
 }
 </script>
 
@@ -68,10 +77,21 @@ const changePhoto = () => {
     </div>
 
     <div class="photo-container">
-      <img :src="currentPhoto" alt="Nosso momento especial" class="photo" />
+      <div v-if="isLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+      </div>
+      <img
+        :src="currentPhoto"
+        alt="Nosso momento especial"
+        class="photo"
+        :class="{ loading: isLoading }"
+      />
     </div>
 
-    <button @click="changePhoto" class="photo-button">Próxima Memória ❤️</button>
+    <button @click="changePhoto" class="photo-button" :disabled="isLoading">
+      <span v-if="!isLoading">Próxima Memória ❤️</span>
+      <span v-else>Carregando...</span>
+    </button>
   </div>
 </template>
 
@@ -101,6 +121,7 @@ const changePhoto = () => {
 }
 
 .photo-container {
+  position: relative;
   width: 80%;
   max-width: 500px;
   margin-top: 2rem;
@@ -224,5 +245,47 @@ const changePhoto = () => {
     font-size: 1rem;
     padding: 0.8rem 1.6rem;
   }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--glow-color);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.photo.loading {
+  opacity: 0.5;
+}
+
+.photo-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.photo-button:disabled:hover {
+  background-color: transparent;
+  color: var(--glow-color);
 }
 </style>
